@@ -4,10 +4,13 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+
+	"github.com/denizogus/pokedexcli/internal/pokecache"
 )
 
 type PokeClient struct {
 	Client http.Client
+	Cache  *pokecache.Cache
 }
 
 func (p *PokeClient) GetLocationAreas(givenUrl *string) (*LocationAreas, error) {
@@ -17,6 +20,13 @@ func (p *PokeClient) GetLocationAreas(givenUrl *string) (*LocationAreas, error) 
 	}
 
 	var locationareas *LocationAreas = &LocationAreas{}
+
+	if data, ok := p.Cache.Get(url); ok {
+		if err := json.Unmarshal(data, locationareas); err != nil {
+			return nil, err
+		}
+		return locationareas, nil
+	}
 
 	request, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -36,6 +46,8 @@ func (p *PokeClient) GetLocationAreas(givenUrl *string) (*LocationAreas, error) 
 	if err := json.Unmarshal(data, locationareas); err != nil {
 		return nil, err
 	}
+
+	p.Cache.Add(url, data)
 
 	return locationareas, nil
 }
