@@ -17,7 +17,7 @@ func startRepl(cfg *config) {
 	scanner := bufio.NewScanner(os.Stdin)
 
 	for {
-		fmt.Print("Pokedex >")
+		fmt.Print("Pokedex > ")
 		scanner.Scan()
 		input := scanner.Text()
 
@@ -29,7 +29,9 @@ func startRepl(cfg *config) {
 		command := cleanInput[0]
 
 		if c, ok := cfg.commands[command]; ok {
-			c.callback(cfg)
+			if err := c.callback(cfg, cleanInput[1:]); err != nil {
+				fmt.Println(err.Error())
+			}
 		} else {
 			fmt.Println("Unknown command")
 		}
@@ -58,13 +60,18 @@ func getCommands() map[string]cliCommand {
 			description: "Lists the previous 20 locations",
 			callback:    commandMapb,
 		},
+		"explore": {
+			name:        "explore",
+			description: "Explores the given location. (>explore canalave-city-area)",
+			callback:    commandExplore,
+		},
 	}
 }
 
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*config) error
+	callback    func(*config, []string) error
 }
 
 type config struct {

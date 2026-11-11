@@ -2,8 +2,8 @@ package main
 
 import "fmt"
 
-func commandMap(cfg *config) error {
-	areas, err := cfg.client.GetLocationAreas(cfg.NextURL)
+func commandMap(cfg *config, param []string) error {
+	areas, err := cfg.client.GetLocationAreas20(cfg.NextURL)
 	if err != nil {
 		return err
 	}
@@ -18,8 +18,8 @@ func commandMap(cfg *config) error {
 	return nil
 }
 
-func commandMapb(cfg *config) error {
-	areas, err := cfg.client.GetLocationAreas(cfg.PrevURL)
+func commandMapb(cfg *config, param []string) error {
+	areas, err := cfg.client.GetLocationAreas20(cfg.PrevURL)
 	if err != nil {
 		return err
 	}
