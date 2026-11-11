@@ -3,6 +3,9 @@ package main
 import "fmt"
 
 func commandMap(cfg *config, param []string) error {
+	if len(param) != 0 {
+		fmt.Errorf("wrong parameters")
+	}
 	areas, err := cfg.client.GetLocationAreas20(cfg.NextURL)
 	if err != nil {
 		return err

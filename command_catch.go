@@ -6,8 +6,8 @@ import (
 )
 
 func commandCatch(cfg *config, param []string) error {
-	if len(param) == 0 {
-		return fmt.Errorf("You need a pokemon to catch...")
+	if len(param) != 1 {
+		return fmt.Errorf("wrong parameters")
 	}
 
 	pokemon, err := cfg.client.GetPokemon(param[0])

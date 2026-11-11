@@ -5,8 +5,8 @@ import (
 )
 
 func commandExplore(cfg *config, param []string) error {
-	if len(param) == 0 {
-		return fmt.Errorf("you need a place to explore...")
+	if len(param) != 1 {
+		return fmt.Errorf("wrong parameters")
 	}
 
 	fmt.Printf("Exploring %s...\n", param[0])
