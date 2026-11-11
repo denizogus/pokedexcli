@@ -3,14 +3,14 @@ package pokecache
 import (
 	"bytes"
 	"testing"
+	"time"
 )
 
 func TestCache(t *testing.T) {
-	cache := NewCache()
-	expected := Cache{
-		Data: map[string][]byte{
-			"test": []byte("test"),
-		},
+	cache := NewCache(5 * time.Second)
+
+	if _, ok := cache.Get("test"); ok {
+		t.Fatal("getting keys that doesnt exist")
 	}
 
 	cache.Add("test", []byte("test"))
@@ -19,7 +19,13 @@ func TestCache(t *testing.T) {
 	if !ok {
 		t.Fatal("couldnt get from the cache")
 	}
-	if !bytes.Equal(data, expected.Data["test"]) {
-		t.Fatalf("expected: %v, got: %v", expected.Data["test"], data)
+	if !bytes.Equal(data, []byte("test")) {
+		t.Fatalf("expected: %v, got: %v", []byte("test"), data)
+	}
+
+	time.Sleep(5 * time.Second)
+
+	if _, ok := cache.Get("test"); ok {
+		t.Fatal("shouldve been deleted but its not.")
 	}
 }
