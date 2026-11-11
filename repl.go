@@ -15,6 +15,7 @@ func cleanInput(text string) []string {
 
 func startRepl(cfg *config) {
 	scanner := bufio.NewScanner(os.Stdin)
+	fmt.Println("start with help")
 
 	for {
 		fmt.Print("Pokedex > ")
@@ -62,8 +63,13 @@ func getCommands() map[string]cliCommand {
 		},
 		"explore": {
 			name:        "explore",
-			description: "Explores the given location. (>explore canalave-city-area)",
+			description: "Explores the location. (> explore canalave-city-area)",
 			callback:    commandExplore,
+		},
+		"catch": {
+			name:        "catch",
+			description: "Attemps to catch the pokemon. (> catch pikachu)",
+			callback:    commandCatch,
 		},
 	}
 }
@@ -79,4 +85,9 @@ type config struct {
 	client   pokeapi.PokeClient
 	NextURL  *string
 	PrevURL  *string
+	Pokedex  Pokedex
+}
+
+type Pokedex struct {
+	Pokemons map[string]pokeapi.Pokemon
 }

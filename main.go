@@ -17,6 +17,9 @@ func main() {
 	cfg := &config{
 		commands: getCommands(),
 		client:   pokeclient,
+		Pokedex: Pokedex{
+			Pokemons: map[string]pokeapi.Pokemon{},
+		},
 	}
 
 	startRepl(cfg)

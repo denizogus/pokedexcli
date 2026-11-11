@@ -14,39 +14,39 @@ type PokeClient struct {
 	Cache  *pokecache.Cache
 }
 
-func (p *PokeClient) GetLocationAreas20(givenUrl *string) (*LocationAreas20, error) {
+func (p *PokeClient) GetLocationAreas20(givenUrl *string) (LocationAreas20, error) {
 	url := baseurl + "/location-area"
 	if givenUrl != nil {
 		url = *givenUrl
 	}
 
-	var locationareas *LocationAreas20 = &LocationAreas20{}
+	var locationareas LocationAreas20 = LocationAreas20{}
 
 	if data, ok := p.Cache.Get(url); ok {
-		if err := json.Unmarshal(data, locationareas); err != nil {
-			return nil, err
+		if err := json.Unmarshal(data, &locationareas); err != nil {
+			return LocationAreas20{}, err
 		}
 		return locationareas, nil
 	}
 
 	request, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return nil, err
+		return LocationAreas20{}, err
 	}
 
 	response, err := p.Client.Do(request)
 	if err != nil {
-		return nil, err
+		return LocationAreas20{}, err
 	}
 	defer response.Body.Close()
 
 	data, err := io.ReadAll(response.Body)
 	if err != nil {
-		return nil, err
+		return LocationAreas20{}, err
 	}
 
-	if err := json.Unmarshal(data, locationareas); err != nil {
-		return nil, err
+	if err := json.Unmarshal(data, &locationareas); err != nil {
+		return LocationAreas20{}, err
 	}
 
 	p.Cache.Add(url, data)
@@ -54,41 +54,81 @@ func (p *PokeClient) GetLocationAreas20(givenUrl *string) (*LocationAreas20, err
 	return locationareas, nil
 }
 
-func (p *PokeClient) GetLocationArea(name string) (*LocationArea, error) {
+func (p *PokeClient) GetLocationArea(name string) (LocationArea, error) {
 	url := baseurl + "/location-area/" + name
-	var locationarea *LocationArea = &LocationArea{}
+	var locationarea LocationArea = LocationArea{}
 
 	if data, ok := p.Cache.Get(url); ok {
-		if err := json.Unmarshal(data, locationarea); err != nil {
-			return nil, err
+		if err := json.Unmarshal(data, &locationarea); err != nil {
+			return LocationArea{}, err
 		}
 		return locationarea, nil
 	}
 
 	request, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return nil, err
+		return LocationArea{}, err
 	}
 
 	response, err := p.Client.Do(request)
 	if err != nil {
-		return nil, err
+		return LocationArea{}, err
 	}
 	defer response.Body.Close()
 
 	if response.StatusCode < 200 || response.StatusCode >= 300 {
-		return nil, fmt.Errorf("Unknown location. (non-ok response code)")
+		return LocationArea{}, fmt.Errorf("Unknown location. (non-ok response code)")
 	}
 
 	data, err := io.ReadAll(response.Body)
 	if err != nil {
-		return nil, err
+		return LocationArea{}, err
 	}
 
-	if err := json.Unmarshal(data, locationarea); err != nil {
-		return nil, err
+	if err := json.Unmarshal(data, &locationarea); err != nil {
+		return LocationArea{}, err
 	}
 
 	p.Cache.Add(url, data)
 	return locationarea, nil
+}
+
+func (p *PokeClient) GetPokemon(name string) (Pokemon, error) {
+	url := baseurl + "/pokemon/" + name
+	var pokemon Pokemon = Pokemon{}
+
+	if data, ok := p.Cache.Get(url); ok {
+		if err := json.Unmarshal(data, &pokemon); err != nil {
+			return Pokemon{}, err
+		}
+		return pokemon, nil
+	}
+
+	request, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return Pokemon{}, err
+	}
+
+	response, err := p.Client.Do(request)
+	if err != nil {
+		return Pokemon{}, err
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode < 200 || response.StatusCode >= 300 {
+		return Pokemon{}, fmt.Errorf("Pokemon not existing. (non-ok response code)")
+	}
+
+	data, err := io.ReadAll(response.Body)
+	if err != nil {
+		return Pokemon{}, err
+	}
+
+	if err := json.Unmarshal(data, &pokemon); err != nil {
+		return Pokemon{}, err
+	}
+
+	p.Cache.Add(url, data)
+
+	return pokemon, nil
 }
